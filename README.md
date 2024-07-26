@@ -22,6 +22,22 @@ docker-compose up -d
 
 * The application will be accessible at http://localhost:8080/swagger/index.html
 
+
+### Some Cool Features
+
+1. First our notification channels are requested in the payload with a name *Type* 
+
+    * SMS = 0,
+    * EMAIL = 1,
+    * PUSH = 2
+
+2. For Mocking the provider down scenario I hardcoded a rule 
+    * If the active sms provider selected as Twillio from the *appsettings.json* and the payload body is equal to "string"
+    it sends an exception and the app switches to the next provider which is amazon sns in the case and retries the request.
+
+3. User can change the notification channels active status without rebuilding or publishing again. Admin has to change the "IsNotificationTypeActive" to false. Then if a request comes with this notification channel, its declined.
+
+
 ### Room for improvement 
 
 * Figure out how to update database from the docker-compose
