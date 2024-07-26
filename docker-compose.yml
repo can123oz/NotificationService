@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres
+    container_name: NotificationDb
+    environment:
+      POSTGRES_USER: testUser
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: NotificationDb
+    ports:
+      - "5432:5432"
+    networks:
+      - notification-network
+
+  api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: notification-service-image
+    container_name: notification-service-api
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      DB_HOST: NotificationDb
+      DB_USER: testUser
+      DB_PASSWORD: 123456
+      DB_NAME: NotificationDb
+      RABBITMQ_HOST: notification-bus
+      RABBITMQ_USER: guest
+      RABBITMQ_PASSWORD: guest
+    #This step is not working, Have to figure out how to fix it..
+    #command: >
+    #  bash -c "until dotnet ef database update --project App/Persistence.cproj; do sleep 5; done && dotnet run --project App/Persistence.cproj"
+    depends_on:
+      - db
+      - rabbitmq
+    networks:
+      - notification-network
+    
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: notification-bus
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"  
+      - "15672:15672"
+    networks:
+      - notification-network
+
+networks:
+  notification-network:
+    driver: bridge
