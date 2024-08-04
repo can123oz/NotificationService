@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Persistence.QueueConsumer;
 using Persistence.Context;
 using Persistence.Repositories;
+using RabbitMQ.Client;
 
 namespace Persistence;
 
@@ -41,5 +42,8 @@ public static class ServiceRegistration
         });
         
         services.AddSingleton<IMessageConsumer<SendNotificationRequest>, NotificationRabbitMqConsumer>();
+
+        services.AddHealthChecks()
+            .AddNpgSql(Configuration.ConnectionString);
     }
 }

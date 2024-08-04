@@ -4,7 +4,6 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-# Set ASP.NET Core environment to Development
 ENV ASPNETCORE_ENVIRONMENT=Development
 ENV BASE_PATH=/src
 

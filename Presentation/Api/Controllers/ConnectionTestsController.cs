@@ -1,19 +1,25 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Persistence;
+﻿using Api.Dto;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Api.Controllers
 {
-    [Route("api/test/")]
+    [Route("/connection")]
     [ApiController]
     public class ConnectionTestsController : ControllerBase
     {
-        [HttpGet("db-connection")]
-        public async Task<IActionResult> TestDbConnection()
+        private readonly HealthCheckService _healthCheckService;
+        public ConnectionTestsController(HealthCheckService healthCheckService)
         {
-            bool isConnected = await ConnectionTestHelper.TestDb();
-            string? env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-            if (isConnected) return Ok("Connected To Db. : " + env);
-            return BadRequest("Failed To Connect : " + env);
+            _healthCheckService = healthCheckService;
+        }
+        
+        [HttpGet]
+        [Route("/test-connections")]
+        public async Task<IActionResult> GetHealth()
+        {
+            HealthReport report = await _healthCheckService.CheckHealthAsync();
+            return Ok(report.ToDto());
         }
     }
 }
